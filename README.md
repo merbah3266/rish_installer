@@ -6,7 +6,7 @@ Instead of manually extracting files from the Shizuku APK and placing them in th
 
 It downloads the latest Shizuku APK, extracts `rish` and its companion file `rish_shizuku.dex`, and installs them into Termux with proper permissions.
 
-## Why Rish
+## Why
 Installing `rish` manually requires multiple steps:
 - Downloading the Shizuku APK.
 - Extracting `rish` and `rish_shizuku.dex` from the APK.
@@ -29,7 +29,7 @@ The script will handle:
 2. Extracting `rish` and `rish_shizuku.dex`.
 3. Installing them in the correct Termux directory with proper permissions.
 
-## How to Run ;rish;
+## How to Run rish
 After installation, simply execute:
 
 ```bash
