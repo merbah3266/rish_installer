@@ -24,7 +24,7 @@ sh <(curl -fsSL https://bit.ly/rish3266)
 - Termux environment
 - Internet connection
 
-The script will handle:
+**The script will handle:**
 1. Fetching the latest Shizuku APK from GitHub.
 2. Extracting `rish` and `rish_shizuku.dex`.
 3. Installing them in the correct Termux directory with proper permissions.
