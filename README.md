@@ -31,11 +31,9 @@ sh <(curl -fsSL https://bit.ly/rish3266)
 
 ## How to Run rish
 After installation, simply execute:
-
 ```bash
 rish
 ```
-
 **Note:**  
 rish works through Shizuku, which provides ADB-like permissions. Make sure Shizuku is running and authorized.
 
@@ -49,6 +47,3 @@ rish works through Shizuku, which provides ADB-like permissions. Make sure Shizu
 - This script is designed specifically for Termux.
 - You must authorize Shizuku before using `rish`.
 - Review any script from the internet before running it for security.
-
-## License
-Provided as-is, use at your own risk.
