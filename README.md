@@ -2,7 +2,7 @@
 
 ## Overview
 This script automates the installation of `rish` in Termux.  
-Instead of manually extracting files from the Shizuku APK and placing them in the correct directory, this installer does it for you in one step.
+Instead of manually extracting files from the Shizuku APP and placing them in the correct directory, this installer does it for you in one step.
 
 It downloads the latest Shizuku APK, extracts `rish` and its companion file `rish_shizuku.dex`, and installs them into Termux with proper permissions.
 
@@ -39,11 +39,9 @@ rish works through Shizuku, which provides ADB-like permissions. Make sure Shizu
 
 ## Benefits
 - Saves time by automating the manual installation process.
-- Ensures you always get the latest version of `rish`.
 - Lets you run `rish` directly in Termux instead of `~/rish`.
 - Reduces mistakes from manual extraction and setup.
 
 ## Important Notes
 - This script is designed specifically for Termux.
 - You must authorize Shizuku before using `rish`.
-- Review any script from the internet before running it for security.
