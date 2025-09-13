@@ -8,7 +8,7 @@ It downloads the latest Shizuku APK, extracts `rish` and its companion file `ris
 
 ## Why
 Installing `rish` manually requires multiple steps:
-- Downloading the Shizuku APK.
+- Downloading the Shizuku APP.
 - Extracting `rish` and `rish_shizuku.dex` from the APK.
 - Placing them in the Termux home directory to run with `~/rish`.
 
