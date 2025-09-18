@@ -18,7 +18,7 @@ The main benefit is that after installation you can run `rish` directly instead 
 ## Installation
 Run the following inside Termux:
 ```bash
-sh <(curl -fsSL https://bit.ly/rish3266)
+bash <(curl -fsSL https://bit.ly/rish3266)
 ```
 **Requirements:**
 - Termux environment
