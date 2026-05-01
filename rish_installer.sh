@@ -1,13 +1,13 @@
 BIN="$(dirname "$(command -v bash)")"
 RISH="$BIN/rish"; DEX="$BIN/rish_shizuku.dex"
-ACTION="install"; SILENT_MODE=0; SOURCE_MODE="default"; SOURCE_PATH=""
+ACTION="install"; SILENT_MODE=0; SOURCE_MODE="default"; SOURCE_PATH=""; SOURCE_PROVIDED=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --uninstall) ACTION="uninstall" ;;
     --reinstall) ACTION="reinstall" ;;
     --silent) SILENT_MODE=1 ;;
-    --source=*) SOURCE_MODE="${1#*=}" ;;
-    --source) shift; SOURCE_MODE="$1" ;;
+    --source=*) SOURCE_MODE="${1#*=}"; SOURCE_PROVIDED=1 ;;
+    --source) shift; SOURCE_MODE="$1"; SOURCE_PROVIDED=1 ;;
     --path=*) SOURCE_PATH="${1#*=}" ;;
     --path) shift; SOURCE_PATH="$1" ;;
   esac
@@ -40,7 +40,7 @@ if [ -f "$RISH" ] && [ "$ACTION" != "reinstall" ] && [ "$SILENT_MODE" -eq 0 ]; t
   echo -ne "${CY}[?]${C0} rish installed. Reinstall? [y/N]: "; read -r c < /dev/tty
   case "$c" in y|Y) ACTION="reinstall" ;; *) msg "Cancelled."; exit 0 ;; esac
 fi
-if [ "$SILENT_MODE" -eq 0 ] && [ -z "$SOURCE_PATH" ]; then
+if [ "$SILENT_MODE" -eq 0 ] && [ "$SOURCE_PROVIDED" -eq 0 ]; then
   echo -e "\n${CB}Select source:${C0}\n 1) Offline (Extract app)\n 2) RikkaApps/Shizuku\n 3) thedjchi/Shizuku\n 4) Custom Repo\n 5) Direct URL\n 6) Local APK"
   read -p "Choice [1-6]: " src_choice < /dev/tty
   case "$src_choice" in
