@@ -13,18 +13,19 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
-if [ "$ACTION" = "uninstall" ]; then
-  rm -f "$RISH" "$DEX" "$HOME/rish" "$HOME/rish_shizuku.dex"
-  find "$HOME" -maxdepth 1 -type l -name "rish*" -delete 2>/dev/null || true
-  echo "[+] rish has been removed."; exit 0
-fi
 if [ -t 1 ]; then C0='\033[0m' CR='\033[1;31m' CG='\033[1;32m' CY='\033[1;33m' CB='\033[1;34m' CC='\033[1;36m'; else C0='' CR='' CG='' CY='' CB='' CC=''; fi
+cancel(){ echo -e "${CY}[!]${C0} $1"; exit 0; }
 msg(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CB}[i]${C0} $1"; }
 ok(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CG}[+]${C0} $1"; }
 warn(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CY}[!]${C0} $1"; }
 err(){ echo -e "${CR}[x]${C0} $1"; exit 1; }
 step(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CC}==>${C0} $1"; }
 cleanup(){ rm -rf "${TMP_SUBDIR:-}"; }; trap cleanup EXIT
+if [ "$ACTION" = "uninstall" ]; then
+  rm -f "$RISH" "$DEX" "$HOME/rish" "$HOME/rish_shizuku.dex"
+  find "$HOME" -maxdepth 1 -type l -name "rish*" -delete 2>/dev/null || true
+  echo -e "${CG}[+]${C0} rish has been removed."; exit 0
+fi
 detect_pkg(){
   p="${PREFIX:-$(pwd)}"
   if [[ "$p" == /data/data/* ]]; then echo "${p#/data/data/}" | cut -d/ -f1; return; fi
@@ -38,7 +39,7 @@ detect_pkg(){
 PKG="$(detect_pkg)"; [ "$PKG" = "unknown" ] && err "Package detect failed"
 if [ -f "$RISH" ] && [ "$ACTION" != "reinstall" ] && [ "$SILENT_MODE" -eq 0 ]; then
   echo -ne "${CY}[?]${C0} rish installed. Reinstall? [y/N]: "; read -r c < /dev/tty
-  case "$c" in y|Y) ACTION="reinstall" ;; *) msg "Cancelled."; exit 0 ;; esac
+  case "$c" in y|Y) ACTION="reinstall" ;; *) cancel "Cancelled."; exit 0 ;; esac
 fi
 if [ "$SILENT_MODE" -eq 0 ] && [ "$SOURCE_PROVIDED" -eq 0 ]; then
   echo -e "\n${CB}Select source:${C0}\n 1) Offline (Extract app)\n 2) RikkaApps/Shizuku\n 3) thedjchi/Shizuku\n 4) Custom Repo\n 5) Direct URL\n 6) Local APK"
@@ -48,10 +49,10 @@ if [ "$SILENT_MODE" -eq 0 ] && [ "$SOURCE_PROVIDED" -eq 0 ]; then
     4) SOURCE_MODE="custom_repo"; read -p "Repo (user/repo): " SOURCE_PATH < /dev/tty ;;
     5) SOURCE_MODE="custom_url"; read -p "URL: " SOURCE_PATH < /dev/tty ;;
     6) SOURCE_MODE="local_file"; read -p "Path: " SOURCE_PATH < /dev/tty ;;
-    *) SOURCE_MODE="default" ;;
+    *) cancel "Invalid choice. Cancelled." ;;
   esac
 fi
-[ "$SILENT_MODE" -eq 1 ] && echo "[+] Starting silent rish installation..."
+[ "$SILENT_MODE" -eq 1 ] && echo -e "${CG}[+]${C0} Starting silent rish installation..."
 TMP_SUBDIR="$(mktemp -d "${TMPDIR:-/tmp}/rish.XXXX")"
 PLAN_A=1; for t in unzip sed grep install; do command -v "$t" >/dev/null || PLAN_A=0; done
 if [ "$PLAN_A" -eq 1 ]; then UNZIP=unzip; SED=sed; GREP=grep; INSTALL=install
@@ -64,28 +65,30 @@ APK_PATH="$TMP_SUBDIR/app.apk"; OFFLINE_OK=0
 if [ "$SOURCE_MODE" = "local_app" ] || [ "$SOURCE_MODE" = "default" ]; then
   step "Offline attempt..."; EXTRACTED="$(cmd package path moe.shizuku.privileged.api --user 0 2>/dev/null | cut -d: -f2)"
   if [ -n "$EXTRACTED" ] && cp "$EXTRACTED" "$APK_PATH" 2>/dev/null; then ok "Local APK extracted"; OFFLINE_OK=1
-  elif [ "$SOURCE_MODE" = "local_app" ]; then err "Shizuku not found locally"
+  elif [ "$SOURCE_MODE" = "local_app" ]; then cancel "Shizuku not found locally. Cancelled."
   else warn "Offline failed, falling back online..."; fi
 fi
 if [ "$OFFLINE_OK" -eq 0 ]; then
   case "$SOURCE_MODE" in
-    local_file) step "Using local file"; [ -z "$SOURCE_PATH" ] && err "No path"; [ ! -f "$SOURCE_PATH" ] && err "File not found"; cp "$SOURCE_PATH" "$APK_PATH" || err "Copy failed"; ok "Copied" ;;
-    custom_url) step "Downloading from URL"; [ -z "$SOURCE_PATH" ] && err "No URL"; curl -fsSL -o "$APK_PATH" "$SOURCE_PATH" || err "Download failed"; ok "Downloaded" ;;
+    local_file) step "Using local file"; [ -z "$SOURCE_PATH" ] && cancel "No path provided. Cancelled."; [ ! -f "$SOURCE_PATH" ] && cancel "File not found. Cancelled."; cp "$SOURCE_PATH" "$APK_PATH" || cancel "Copy failed. Cancelled."; ok "Copied" ;;
+    custom_url) step "Downloading from URL"; [ -z "$SOURCE_PATH" ] && cancel "No URL provided. Cancelled."; curl -fsSL -o "$APK_PATH" "$SOURCE_PATH" || cancel "Download failed. Cancelled."; ok "Downloaded" ;;
     default|thedjchi|custom_repo)
       if [ "$SOURCE_MODE" = "default" ]; then REPO="RikkaApps/Shizuku"; elif [ "$SOURCE_MODE" = "thedjchi" ]; then REPO="thedjchi/Shizuku"; else REPO="$SOURCE_PATH"; fi
-      step "Fetching from $REPO..."; URL="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"browser_download_url":[[:space:]]*"\([^"]*\.apk\)".*/\1/p' | head -n1)"; [ -z "$URL" ] && err "URL fetch failed"
-      step "Downloading APK..."; curl -fsSL -o "$APK_PATH" "$URL" || err "Download failed"; ok "Downloaded" ;;
-    *) err "Invalid source" ;;
+      [ -z "$REPO" ] && cancel "No repo provided. Cancelled."
+      step "Fetching from $REPO..."; URL="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"browser_download_url":[[:space:]]*"\([^"]*\.apk\)".*/\1/p' | head -n1)"; [ -z "$URL" ] && cancel "URL fetch failed. Cancelled."
+      step "Downloading APK..."; curl -fsSL -o "$APK_PATH" "$URL" || cancel "Download failed. Cancelled."; ok "Downloaded" ;;
+    *) cancel "Invalid source. Cancelled." ;;
   esac
 fi
 step "Extracting..."; $UNZIP -qq "$APK_PATH" -d "$TMP_SUBDIR" || err "Unzip failed"
 [ ! -f "$TMP_SUBDIR/assets/rish" ] && err "rish not found"; [ ! -f "$TMP_SUBDIR/assets/rish_shizuku.dex" ] && err "dex not found"
 SH_PATH="$(command -v sh)"; [ -z "$SH_PATH" ] && err "sh not found"
 TMP_RISH="$(mktemp "$TMP_SUBDIR/rish.XXXX")"; echo "#!$SH_PATH" > "$TMP_RISH"; $GREP -v '^#' "$TMP_SUBDIR/assets/rish" >> "$TMP_RISH"; $SED -i "s/PKG/$PKG/g" "$TMP_RISH"
+
 step "Installing..."; INSTALL_SUCCESS=0
 if $INSTALL -m755 "$TMP_RISH" "$RISH" 2>/dev/null && $INSTALL -m400 "$TMP_SUBDIR/assets/rish_shizuku.dex" "$DEX" 2>/dev/null; then
   ok "Installed to bin ($BIN)"; ln -sf "$RISH" "$HOME/rish" 2>/dev/null; ln -sf "$DEX" "$HOME/rish_shizuku.dex" 2>/dev/null; INSTALL_SUCCESS=1
 else
   warn "Bin failed, trying Home..."; if $INSTALL -m755 "$TMP_RISH" "$HOME/rish" && $INSTALL -m400 "$TMP_SUBDIR/assets/rish_shizuku.dex" "$HOME/rish_shizuku.dex"; then ok "Installed to Home"; INSTALL_SUCCESS=1; fi
 fi
-if [ "$INSTALL_SUCCESS" -eq 1 ]; then [ "$SILENT_MODE" -eq 1 ] && echo "[+] Success: rish installed." || ok "Setup complete. Run 'rish' or '~/rish'"; else err "Installation failed"; fi
+if [ "$INSTALL_SUCCESS" -eq 1 ]; then [ "$SILENT_MODE" -eq 1 ] && echo -e "${CG}[+]${C0} Success: rish installed." || ok "Setup complete. Run 'rish' or '~/rish'"; else err "Installation failed"; fi
