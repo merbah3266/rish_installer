@@ -1,14 +1,17 @@
 BIN="$(dirname "$(command -v bash)")"
 RISH="$BIN/rish"; DEX="$BIN/rish_shizuku.dex"
 ACTION="install"; SILENT_MODE=0; SOURCE_MODE="default"; SOURCE_PATH=""
-for a in "$@"; do
-  case "$a" in
+while [ $# -gt 0 ]; do
+  case "$1" in
     --uninstall) ACTION="uninstall" ;;
     --reinstall) ACTION="reinstall" ;;
     --silent) SILENT_MODE=1 ;;
+    --source=*) SOURCE_MODE="${1#*=}" ;;
     --source) shift; SOURCE_MODE="$1" ;;
+    --path=*) SOURCE_PATH="${1#*=}" ;;
     --path) shift; SOURCE_PATH="$1" ;;
   esac
+  shift
 done
 if [ "$ACTION" = "uninstall" ]; then
   rm -f "$RISH" "$DEX" "$HOME/rish" "$HOME/rish_shizuku.dex"
