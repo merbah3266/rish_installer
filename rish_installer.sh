@@ -32,7 +32,7 @@ trap on_cancel INT
 trap cleanup EXIT
 if [ "$ACTION" = "uninstall" ]; then
   rm -f "$RISH" "$DEX" "$HOME/rish" "$HOME/rish_shizuku.dex"
-  find "$HOME" -maxdepth 1 -type l -name "rish*" -delete 2>/dev/null || true
+  find "$HOME" -maxdepth 1 -type l -name "rish*" -delete || true
   echo -e "${CG}[+]${C0} rish has been removed."; exit 0
 fi
 detect_pkg(){
@@ -56,12 +56,12 @@ if [ -f "$RISH" ] && [ "$ACTION" != "reinstall" ] && [ "$SILENT_MODE" -eq 0 ]; t
 fi
 if [ "$SILENT_MODE" -eq 0 ] && [ "$SOURCE_PROVIDED" -eq 0 ]; then
   echo -e "\n${CB}Select source:${C0}\n 1) Offline (Extract app)\n 2) RikkaApps/Shizuku\n 3) thedjchi/Shizuku\n 4) Custom Repo\n 5) Direct URL\n 6) Local APK"
-  read -p "Choice [1-6]: " src_choice < /dev/tty
+  printf "Choice [1-6]: "; read src_choice < /dev/tty
   case "$src_choice" in
     1) SOURCE_MODE="local_app" ;; 2) SOURCE_MODE="default" ;; 3) SOURCE_MODE="thedjchi" ;;
-    4) SOURCE_MODE="custom_repo"; read -p "Repo (user/repo): " SOURCE_PATH < /dev/tty ;;
-    5) SOURCE_MODE="custom_url"; read -p "URL: " SOURCE_PATH < /dev/tty ;;
-    6) SOURCE_MODE="local_file"; read -p "Path: " SOURCE_PATH < /dev/tty ;;
+    4) SOURCE_MODE="custom_repo"; printf "Repo (user/repo): "; read SOURCE_PATH < /dev/tty ;;
+    5) SOURCE_MODE="custom_url"; printf "URL: "; read SOURCE_PATH < /dev/tty ;;
+    6) SOURCE_MODE="local_file"; printf "Path: "; read SOURCE_PATH < /dev/tty ;;
     *) cancel "Invalid choice. Cancelled." ;;
   esac
 fi
