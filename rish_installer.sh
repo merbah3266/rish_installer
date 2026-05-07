@@ -20,7 +20,15 @@ ok(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CG}[+]${C0} $1"; }
 warn(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CY}[!]${C0} $1"; }
 err(){ echo -e "${CR}[x]${C0} $1"; exit 1; }
 step(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CC}==>${C0} $1"; }
-cleanup(){ rm -rf "${TMP_SUBDIR:-}"; }; trap cleanup EXIT
+cleanup() {
+    [ -n "$TMP_SUBDIR" ] && rm -rf "$TMP_SUBDIR"
+}
+on_cancel() {
+    echo -e "\n${CY}[!]${C0} Operation cancelled by user."
+    exit 1
+}
+trap on_cancel INT
+trap cleanup EXIT
 if [ "$ACTION" = "uninstall" ]; then
   rm -f "$RISH" "$DEX" "$HOME/rish" "$HOME/rish_shizuku.dex"
   find "$HOME" -maxdepth 1 -type l -name "rish*" -delete 2>/dev/null || true
@@ -28,11 +36,15 @@ if [ "$ACTION" = "uninstall" ]; then
 fi
 detect_pkg(){
   p="${PREFIX:-$(pwd)}"
-  if [[ "$p" == /data/data/* ]]; then echo "${p#/data/data/}" | cut -d/ -f1; return; fi
-  if [[ "$p" == /data/user/* ]]; then echo "$p" | cut -d/ -f5; return; fi
+  case "$p" in
+    /data/data/*) echo "${p#/data/data/}" | cut -d/ -f1; return ;;
+    /data/user/*) echo "$p" | cut -d/ -f5; return ;;
+  esac
   if [ -n "$HOME" ]; then
-    if [[ "$HOME" == /data/data/* ]]; then echo "${HOME#/data/data/}" | cut -d/ -f1; return; fi
-    if [[ "$HOME" == /data/user/* ]]; then echo "$HOME" | cut -d/ -f5; return; fi
+    case "$HOME" in
+      /data/data/*) echo "${HOME#/data/data/}" | cut -d/ -f1; return ;;
+      /data/user/*) echo "$HOME" | cut -d/ -f5; return ;;
+    esac
   fi
   echo "unknown"
 }
@@ -53,7 +65,9 @@ if [ "$SILENT_MODE" -eq 0 ] && [ "$SOURCE_PROVIDED" -eq 0 ]; then
   esac
 fi
 [ "$SILENT_MODE" -eq 1 ] && echo -e "${CG}[+]${C0} Starting silent rish installation..."
-TMP_SUBDIR="$(mktemp -d "${TMPDIR:-/tmp}/rish.XXXX")"
+RAND_ID="$RANDOM"
+TMP_SUBDIR="${TMPDIR:-/tmp}/rish.$RAND_ID"
+mkdir -p "$TMP_SUBDIR"
 PLAN_A=1; for t in unzip sed grep install; do command -v "$t" >/dev/null || PLAN_A=0; done
 if [ "$PLAN_A" -eq 1 ]; then UNZIP=unzip; SED=sed; GREP=grep; INSTALL=install
 else
@@ -83,8 +97,7 @@ fi
 step "Extracting..."; $UNZIP -qq "$APK_PATH" -d "$TMP_SUBDIR" || err "Unzip failed"
 [ ! -f "$TMP_SUBDIR/assets/rish" ] && err "rish not found"; [ ! -f "$TMP_SUBDIR/assets/rish_shizuku.dex" ] && err "dex not found"
 SH_PATH="$(command -v sh)"; [ -z "$SH_PATH" ] && err "sh not found"
-TMP_RISH="$(mktemp "$TMP_SUBDIR/rish.XXXX")"; echo "#!$SH_PATH" > "$TMP_RISH"; $GREP -v '^#' "$TMP_SUBDIR/assets/rish" >> "$TMP_RISH"; $SED -i "s/PKG/$PKG/g" "$TMP_RISH"
-
+TMP_RISH="$TMP_SUBDIR/rish.$RAND_ID"; echo "#!$SH_PATH" > "$TMP_RISH"; $GREP -v '^#' "$TMP_SUBDIR/assets/rish" >> "$TMP_RISH"; $SED -i "s/PKG/$PKG/g" "$TMP_RISH"
 step "Installing..."; INSTALL_SUCCESS=0
 if $INSTALL -m755 "$TMP_RISH" "$RISH" 2>/dev/null && $INSTALL -m400 "$TMP_SUBDIR/assets/rish_shizuku.dex" "$DEX" 2>/dev/null; then
   ok "Installed to bin ($BIN)"; ln -sf "$RISH" "$HOME/rish" 2>/dev/null; ln -sf "$DEX" "$HOME/rish_shizuku.dex" 2>/dev/null; INSTALL_SUCCESS=1
