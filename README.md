@@ -2,8 +2,6 @@
 
 A smart, highly customizable, and robust installer for Shizuku's Rish (Remote Shell) on Android terminals.
 
----
-
 ## Features
 
 *   **Smart Offline-First:** Automatically tries to extract Rish from the installed Shizuku app before downloading from the internet.
@@ -12,8 +10,6 @@ A smart, highly customizable, and robust installer for Shizuku's Rish (Remote Sh
 *   **Automatic BusyBox Fallback:** If your terminal lacks standard tools (`unzip`, `sed`, `grep`), it automatically downloads a standalone BusyBox binary to use instead.
 *   **Smart Installation Paths:** Tries to install to the system `$BIN` first; if permission is denied, it falls back to `$HOME` and creates symlinks automatically.
 *   **Auto Package Detection:** Automatically detects your terminal's package name (e.g., `com.termux`) to configure Rish correctly.
-
----
 
 ## Quick Start (Basic Usage)
 
@@ -32,8 +28,6 @@ bash <(curl -fsSL tinyurl.com/rish3266) --uninstall
 rish
 ```
 *(If `rish` doesn't work, use `~/rish`)*
-
----
 
 ## Advanced Usage (Flags)
 
@@ -93,8 +87,6 @@ bash <(curl -fsSL tinyurl.com/rish3266) --silent --source custom_url --path "htt
 bash <(curl -fsSL tinyurl.com/rish3266) --silent --reinstall --source thedjchi
 ```
 
----
-
 ## How It Works (Under the Hood)
 
 1.  **Package Detection:** The script checks `$PREFIX`, `$PWD`, and `$HOME` to figure out your terminal app's Android package name (e.g., `com.termux`). This is required for Rish to bind to Shizuku.
@@ -104,8 +96,6 @@ bash <(curl -fsSL tinyurl.com/rish3266) --silent --reinstall --source thedjchi
     *   If offline fails or a remote source is selected, it queries the GitHub API to find the latest release APK URL and downloads it via `curl`.
 4.  **Extraction & Patching:** The script unzips the APK, extracts `assets/rish` and `assets/rish_shizuku.dex`, removes comment lines from `rish`, replaces the `PKG` placeholder with your detected package name, and attaches the correct shebang (`#!/path/to/sh`).
 5.  **Installation:** It attempts to install the files to `$BIN` (where `bash` resides). If permission is denied, it gracefully falls back to installing directly in `$HOME` and creates symlinks (`~/rish`, `~/rish_shizuku.dex`) for easy access.
-
----
 
 ## Interactive Menu Options
 
@@ -129,8 +119,6 @@ Choice [1-6]:
 *   **Option 5:** Prompts you for a direct URL linking to an `.apk` file.
 *   **Option 6:** Prompts you for a local file path (e.g., `/sdcard/Download/app.apk`) to install from.
 
----
-
 ## Requirements & Notes
 
 *   **Terminal App:** Termux or MT Manager terminal is highly recommended.
@@ -138,6 +126,20 @@ Choice [1-6]:
 *   **Shizuku Running:** Ensure the Shizuku app is running and your terminal app is authorized in Shizuku's permissions.
 *   **Internet Connection:** Required only if you are downloading from a GitHub repo or Direct URL. Not required for `local_app` or `local_file` sources.
 *   **Shizuku Version:** It is highly recommended to use the [latest version](https://github.com/RikkaApps/Shizuku/releases/) of Shizuku from GitHub. The Play Store version is often outdated and may not work correctly with Rish.
+
+## Running without Bash (Fallback)
+
+If you are in an environment where `bash` is not installed, you can use the POSIX-compliant `sh` launcher. This launcher will automatically check for `bash` first, and if it's missing, it will download the appropriate BusyBox binary to execute the installer via `ash`.
+
+**To install using `sh` (No Bash required):**
+```bash
+curl -fSs https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh
+```
+
+*Note: To pass flags (like `--silent` or `--uninstall`) when using the `sh` launcher, append them at the end like this:*
+```bash
+curl -fSs https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh -s -- --silent --uninstall
+```
 
 ## Support
 
