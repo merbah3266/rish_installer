@@ -1,4 +1,4 @@
-BIN="$(dirname "$(command -v bash)")"
+BIN="$(dirname "$(command -v bash 2>/dev/null)")"
 RISH="$BIN/rish"; DEX="$BIN/rish_shizuku.dex"
 ACTION="install"; SILENT_MODE=0; SOURCE_MODE="default"; SOURCE_PATH=""; SOURCE_PROVIDED=0
 while [ $# -gt 0 ]; do
@@ -21,7 +21,7 @@ warn(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CY}[!]${C0} $1"; }
 err(){ echo -e "${CR}[x]${C0} $1"; exit 1; }
 step(){ [ "$SILENT_MODE" -eq 0 ] && echo -e "${CC}==>${C0} $1"; }
 cleanup() {
-    [ -n "$TMP_SUBDIR" ] && rm -rf "$TMP_SUBDIR"
+    [ -n "$TMP_SUBDIR" ] && rm -rf "$TMP_SUBDIR" 2>/dev/null
 }
 on_cancel() {
     echo -e "\n${CY}[!]${C0} Operation cancelled by user."
@@ -30,7 +30,7 @@ on_cancel() {
 trap on_cancel INT
 trap cleanup EXIT
 if [ "$ACTION" = "uninstall" ]; then
-  rm -f "$RISH" "$DEX" "$HOME/rish" "$HOME/rish_shizuku.dex"
+  rm -f "$RISH" "$DEX" "$HOME/rish" "$HOME/rish_shizuku.dex" 2>/dev/null
   find "$HOME" -maxdepth 1 -type l -name "rish*" -delete 2>/dev/null || true
   echo -e "${CG}[+]${C0} rish has been removed."; exit 0
 fi
@@ -67,12 +67,12 @@ fi
 [ "$SILENT_MODE" -eq 1 ] && echo -e "${CG}[+]${C0} Starting silent rish installation..."
 RAND_ID="$RANDOM"
 TMP_SUBDIR="${TMPDIR:-/tmp}/rish.$RAND_ID"
-mkdir -p "$TMP_SUBDIR"
-PLAN_A=1; for t in unzip sed grep install; do command -v "$t" >/dev/null || PLAN_A=0; done
+mkdir -p "$TMP_SUBDIR" 2>/dev/null
+PLAN_A=1; for t in unzip sed grep install; do command -v "$t" >/dev/null 2>&1 || PLAN_A=0; done
 if [ "$PLAN_A" -eq 1 ]; then UNZIP=unzip; SED=sed; GREP=grep; INSTALL=install
 else
   warn "Using busybox"; ARCH="$(uname -m)"; case "$ARCH" in aarch64|arm64|armv8*) ARCH=arm64;; armv*|armhf|arm) ARCH=arm;; x86_64|amd64) ARCH=x86_64;; i386|i686|x86) ARCH=x86;; *) err "Unsupported arch";; esac
-  BB="$TMP_SUBDIR/busybox"; step "Downloading BusyBox..."; curl -fsSL "https://raw.githubusercontent.com/merbah3266/rish_installer/main/busybox/$ARCH/busybox" -o "$BB" || err "BB download failed"; chmod +x "$BB"
+  BB="$TMP_SUBDIR/busybox"; step "Downloading BusyBox..."; curl -fsSL "https://raw.githubusercontent.com/merbah3266/rish_installer/main/busybox/$ARCH/busybox" -o "$BB" 2>/dev/null || err "BB download failed"; chmod +x "$BB" 2>/dev/null
   UNZIP="$BB unzip"; SED="$BB sed"; GREP="$BB grep"; INSTALL="$BB install"; ok "BusyBox ready."
 fi
 APK_PATH="$TMP_SUBDIR/app.apk"; OFFLINE_OK=0
@@ -84,24 +84,25 @@ if [ "$SOURCE_MODE" = "local_app" ] || [ "$SOURCE_MODE" = "default" ]; then
 fi
 if [ "$OFFLINE_OK" -eq 0 ]; then
   case "$SOURCE_MODE" in
-    local_file) step "Using local file"; [ -z "$SOURCE_PATH" ] && cancel "No path provided. Cancelled."; [ ! -f "$SOURCE_PATH" ] && cancel "File not found. Cancelled."; cp "$SOURCE_PATH" "$APK_PATH" || cancel "Copy failed. Cancelled."; ok "Copied" ;;
-    custom_url) step "Downloading from URL"; [ -z "$SOURCE_PATH" ] && cancel "No URL provided. Cancelled."; curl -fsSL -o "$APK_PATH" "$SOURCE_PATH" || cancel "Download failed. Cancelled."; ok "Downloaded" ;;
+    local_file) step "Using local file"; [ -z "$SOURCE_PATH" ] && cancel "No path provided. Cancelled."; [ ! -f "$SOURCE_PATH" ] && cancel "File not found. Cancelled."; cp "$SOURCE_PATH" "$APK_PATH" 2>/dev/null || cancel "Copy failed. Cancelled."; ok "Copied" ;;
+    custom_url) step "Downloading from URL"; [ -z "$SOURCE_PATH" ] && cancel "No URL provided. Cancelled."; curl -fsSL -o "$APK_PATH" "$SOURCE_PATH" 2>/dev/null || cancel "Download failed. Cancelled."; ok "Downloaded" ;;
     default|thedjchi|custom_repo)
       if [ "$SOURCE_MODE" = "default" ]; then REPO="RikkaApps/Shizuku"; elif [ "$SOURCE_MODE" = "thedjchi" ]; then REPO="thedjchi/Shizuku"; else REPO="$SOURCE_PATH"; fi
       [ -z "$REPO" ] && cancel "No repo provided. Cancelled."
-      step "Fetching from $REPO..."; URL="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"browser_download_url":[[:space:]]*"\([^"]*\.apk\)".*/\1/p' | head -n1)"; [ -z "$URL" ] && cancel "URL fetch failed. Cancelled."
-      step "Downloading APK..."; curl -fsSL -o "$APK_PATH" "$URL" || cancel "Download failed. Cancelled."; ok "Downloaded" ;;
+      step "Fetching from $REPO..."; URL="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" 2>/dev/null | sed -n 's/.*"browser_download_url":[[:space:]]*"\([^"]*\.apk\)".*/\1/p' 2>/dev/null)"; [ -z "$URL" ] && cancel "URL fetch failed. Cancelled."
+      step "Downloading APK..."; curl -fsSL -o "$APK_PATH" "$URL" 2>/dev/null || cancel "Download failed. Cancelled."; ok "Downloaded" ;;
     *) cancel "Invalid source. Cancelled." ;;
   esac
 fi
-step "Extracting..."; $UNZIP -qq "$APK_PATH" -d "$TMP_SUBDIR" || err "Unzip failed"
+step "Extracting..."; $UNZIP -qq "$APK_PATH" -d "$TMP_SUBDIR" 2>/dev/null || err "Unzip failed"
 [ ! -f "$TMP_SUBDIR/assets/rish" ] && err "rish not found"; [ ! -f "$TMP_SUBDIR/assets/rish_shizuku.dex" ] && err "dex not found"
-SH_PATH="$(command -v sh)"; [ -z "$SH_PATH" ] && err "sh not found"
-TMP_RISH="$TMP_SUBDIR/rish.$RAND_ID"; echo "#!$SH_PATH" > "$TMP_RISH"; $GREP -v '^#' "$TMP_SUBDIR/assets/rish" >> "$TMP_RISH"; $SED -i "s/PKG/$PKG/g" "$TMP_RISH"
+SH_PATH="$(command -v sh 2>/dev/null)"; [ -z "$SH_PATH" ] && err "sh not found"
+TMP_RISH="$TMP_SUBDIR/rish.$RAND_ID"; echo "#!$SH_PATH" > "$TMP_RISH" 2>/dev/null; $GREP -v '^#' "$TMP_SUBDIR/assets/rish" >> "$TMP_RISH" 2>/dev/null; $SED -i "s/PKG/$PKG/g" "$TMP_RISH" 2>/dev/null
+
 step "Installing..."; INSTALL_SUCCESS=0
 if $INSTALL -m755 "$TMP_RISH" "$RISH" 2>/dev/null && $INSTALL -m400 "$TMP_SUBDIR/assets/rish_shizuku.dex" "$DEX" 2>/dev/null; then
   ok "Installed to bin ($BIN)"; ln -sf "$RISH" "$HOME/rish" 2>/dev/null; ln -sf "$DEX" "$HOME/rish_shizuku.dex" 2>/dev/null; INSTALL_SUCCESS=1
 else
-  warn "Bin failed, trying Home..."; if $INSTALL -m755 "$TMP_RISH" "$HOME/rish" && $INSTALL -m400 "$TMP_SUBDIR/assets/rish_shizuku.dex" "$HOME/rish_shizuku.dex"; then ok "Installed to Home"; INSTALL_SUCCESS=1; fi
+  warn "Bin failed, trying Home..."; if $INSTALL -m755 "$TMP_RISH" "$HOME/rish" 2>/dev/null && $INSTALL -m400 "$TMP_SUBDIR/assets/rish_shizuku.dex" "$HOME/rish_shizuku.dex" 2>/dev/null; then ok "Installed to Home"; INSTALL_SUCCESS=1; fi
 fi
 if [ "$INSTALL_SUCCESS" -eq 1 ]; then [ "$SILENT_MODE" -eq 1 ] && echo -e "${CG}[+]${C0} Success: rish installed." || ok "Setup complete. Run 'rish' or '~/rish'"; else err "Installation failed"; fi
