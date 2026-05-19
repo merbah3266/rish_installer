@@ -305,6 +305,7 @@ int main(int argc, char *argv[]) {
     if (access(RISH_PATH, F_OK) != -1 && !ACTION_REINSTALL && !SILENT_MODE) {
         printf("%s[?]%s rish installed. Reinstall? [y/N]: ", CY, C0);
         char c = getchar();
+        int ch; while ((ch = getchar()) != '\n' && ch != EOF);
         if (c == 'y' || c == 'Y') ACTION_REINSTALL = 1;
         else cancel("Cancelled.");
     }
@@ -312,14 +313,39 @@ int main(int argc, char *argv[]) {
     if (!SILENT_MODE && !SOURCE_PROVIDED) {
         printf("\n%sSelect source:%s\n 1) Offline (Extract app)\n 2) RikkaApps/Shizuku\n 3) thedjchi/Shizuku\n 4) Custom Repo\n 5) Direct URL\n 6) Local APK\n", CB, C0);
         printf("Choice [1-6]: ");
-        int choice; scanf("%d", &choice);
+        int choice; 
+        if (scanf("%d", &choice) != 1) { choice = 0; }
+        int ch; while ((ch = getchar()) != '\n' && ch != EOF);
+        
+        char input_buf[512];
         switch(choice) {
             case 1: SOURCE_MODE = "local_app"; break;
             case 2: SOURCE_MODE = "default"; break;
             case 3: SOURCE_MODE = "thedjchi"; break;
-            case 4: SOURCE_MODE = "custom_repo"; printf("Repo (user/repo): "); scanf("%ms", &SOURCE_PATH); break;
-            case 5: SOURCE_MODE = "custom_url"; printf("URL: "); scanf("%ms", &SOURCE_PATH); break;
-            case 6: SOURCE_MODE = "local_file"; printf("Path: "); scanf("%ms", &SOURCE_PATH); break;
+            case 4: 
+                SOURCE_MODE = "custom_repo"; 
+                printf("Repo (user/repo): "); 
+                input_buf[0] = '\0';
+                scanf("%255s", input_buf); 
+                SOURCE_PATH = strdup(input_buf); 
+                while ((ch = getchar()) != '\n' && ch != EOF);
+                break;
+            case 5: 
+                SOURCE_MODE = "custom_url"; 
+                printf("URL: "); 
+                input_buf[0] = '\0';
+                scanf("%511[^\n]", input_buf); 
+                SOURCE_PATH = strdup(input_buf); 
+                while ((ch = getchar()) != '\n' && ch != EOF);
+                break;
+            case 6: 
+                SOURCE_MODE = "local_file"; 
+                printf("Path: "); 
+                input_buf[0] = '\0';
+                scanf("%511[^\n]", input_buf); 
+                SOURCE_PATH = strdup(input_buf); 
+                while ((ch = getchar()) != '\n' && ch != EOF);
+                break;
             default: cancel("Invalid choice. Cancelled.");
         }
     }
