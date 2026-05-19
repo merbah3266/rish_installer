@@ -74,7 +74,7 @@ jobs:
       - name: Build with NDK Clang
         run: |
           NDK=$HOME/android-ndk-r26d/toolchains/llvm/prebuilt/linux-x86_64/bin
-          SYSROOT=$HOME/termux_sysroot
+          SYSROOT=$HOME/termux_sysroot/data/data/com.termux/files
           OUT=${{ matrix.out }}
 
           $NDK/${{ matrix.ndk_tool }} main.c miniz.c -o $OUT \
@@ -82,7 +82,7 @@ jobs:
             -Wl,--gc-sections -Wl,--as-needed -Wl,-O2 \
             -DMINIZ_NO_ARCHIVE_WRITING_APIS -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES \
             -I$SYSROOT/usr/include -L$SYSROOT/usr/lib \
-            -lcurl -lz -lssl -lcrypto \
+            -lcurl -lnghttp2 -lssh2 -lz -lssl -lcrypto \
             -s
 
       - uses: actions/upload-artifact@v4
