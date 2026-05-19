@@ -29,6 +29,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: clang_version
 
       - uses: actions/cache@v4
         id: cache-ndk
@@ -102,11 +104,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git fetch origin clang_version || true
-          git checkout clang_version || git checkout --orphan clang_version
-
           mkdir -p binaries
           git add -A binaries
 
           git commit -m "update binaries $(date '+%Y-%m-%d %H:%M:%S')" || true
-          git push origin clang_version --force
+          git push origin clang_version
