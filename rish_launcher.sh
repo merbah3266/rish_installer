@@ -1,41 +1,46 @@
+self_cleanup() {
+case "$0" in
+*proc*) ;;
+*sh) ;;
+*)
+[ -w "$0" ] && rm -f "$0"
+;;
+esac
+}
+[ "$(id -u)" -eq 0 ] && {
+echo "Error: Please do not run this as root!"
+self_cleanup
+exit 1
+}
 exec 2>/dev/null
 SCRIPT_URL="https://tinyurl.com/rish3266"
 RAND_ID="$RANDOM"
 TMP_DIR="${TMPDIR:-/tmp}/rish_launch.$RAND_ID"
 TMP_SCRIPT="$TMP_DIR/rish_installer.sh"
 cleanup() {
-    rm -rf "$TMP_DIR"
+rm -rf "$TMP_DIR"
+self_cleanup
 }
 trap cleanup INT EXIT
 mkdir -p "$TMP_DIR"
 if command -v bash >/dev/null 2>&1; then
-    curl -fsSL "$SCRIPT_URL" -o "$TMP_SCRIPT"
-    if [ ! -f "$TMP_SCRIPT" ]; then
-        echo "Script download failed"
-        exit 1
-    fi
-    bash "$TMP_SCRIPT" "$@"
+curl -fsSL "$SCRIPT_URL" -o "$TMP_SCRIPT"
+[ ! -f "$TMP_SCRIPT" ] && { echo "Script download failed"; exit 1; }
+bash "$TMP_SCRIPT" "$@"
 else
-    ARCH="$(uname -m)"
-    case "$ARCH" in
-        aarch64|arm64|armv8*) ARCH="arm64" ;;
-        armv*|armhf|arm) ARCH="arm" ;;
-        x86_64|amd64) ARCH="x86_64" ;;
-        i386|i686|x86) ARCH="x86" ;;
-        *) echo "Unsupported arch"; exit 1 ;;
-    esac
-    BB="$TMP_DIR/busybox"
-    curl -fsSL "https://raw.githubusercontent.com/merbah3266/rish_installer/main/busybox/$ARCH/busybox" -o "$BB"
-    if [ ! -f "$BB" ]; then
-        echo "BusyBox download failed"
-        exit 1
-    fi
-    chmod +x "$BB"
-    
-    curl -fsSL "$SCRIPT_URL" -o "$TMP_SCRIPT"
-    if [ ! -f "$TMP_SCRIPT" ]; then
-        echo "Script download failed"
-        exit 1
-    fi
-    "$BB" ash "$TMP_SCRIPT" "$@"
+ARCH="$(uname -m)"
+case "$ARCH" in
+aarch64|arm64|armv8*) ARCH="arm64" ;;
+armv*|armhf|arm) ARCH="arm" ;;
+x86_64|amd64) ARCH="x86_64" ;;
+i386|i686|x86) ARCH="x86" ;;
+*) echo "Unsupported arch"; exit 1 ;;
+esac
+BB="$TMP_DIR/busybox"
+curl -fsSL "https://raw.githubusercontent.com/merbah3266/rish_installer/main/busybox/$ARCH/busybox" -o "$BB"
+[ ! -f "$BB" ] && { echo "BusyBox download failed"; exit 1; }
+chmod +x "$BB"
+curl -fsSL "$SCRIPT_URL" -o "$TMP_SCRIPT"
+[ ! -f "$TMP_SCRIPT" ] && { echo "Script download failed"; exit 1; }
+"$BB" ash "$TMP_SCRIPT" "$@"
 fi
