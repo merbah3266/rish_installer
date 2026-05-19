@@ -1,0 +1,111 @@
+name: Build rish_installer
+
+on:
+  schedule:
+    - cron: "0 1 10 * *"
+    - cron: "0 1 20 * *"
+    - cron: "0 1 30 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: aarch64
+            ndk_tool: aarch64-linux-android24-clang
+            termux_arch: aarch64
+            out: rish_installer_arm64
+          - arch: arm
+            ndk_tool: armv7a-linux-androideabi24-clang
+            termux_arch: arm
+            out: rish_installer_armv7
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: clang_version
+
+      - uses: actions/cache@v4
+        id: cache-ndk
+        with:
+          path: $HOME/android-ndk-r26d
+          key: ndk-r26d
+
+      - name: Setup NDK
+        if: steps.cache-ndk.outputs.cache-hit != 'true'
+        run: |
+          wget -q https://dl.google.com/android/repository/android-ndk-r26d-linux.zip
+          unzip -q android-ndk-r26d-linux.zip -d $HOME
+
+      - name: Setup Termux Sysroot
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq dpkg > /dev/null
+          mkdir -p $HOME/termux_sysroot
+          wget -q https://packages.termux.dev/apt/termux-main/dists/stable/main/binary-${{ matrix.termux_arch }}/Packages -O termux_packages.txt
+
+          download_and_extract() {
+            local pkg_name=$1
+            local pkg_path=$(awk -v pkg="Package: $pkg_name" '
+              $0 == pkg { found=1 }
+              found && /^Filename:/ { print $2; exit }
+            ' termux_packages.txt)
+
+            if [ -z "$pkg_path" ]; then echo "Failed to find $pkg_name"; exit 1; fi
+            wget -q "https://packages.termux.dev/apt/termux-main/$pkg_path" -O /tmp/$pkg_name.deb
+            dpkg-deb -x /tmp/$pkg_name.deb $HOME/termux_sysroot
+          }
+
+          download_and_extract libcurl
+          download_and_extract libopenssl
+          download_and_extract zlib
+
+      - name: Build with NDK Clang
+        run: |
+          NDK=$HOME/android-ndk-r26d/toolchains/llvm/prebuilt/linux-x86_64/bin
+          SYSROOT=$HOME/termux_sysroot
+          OUT=${{ matrix.out }}
+
+          $NDK/${{ matrix.ndk_tool }} main.c miniz.c -o $OUT \
+            -Oz -flto -ffunction-sections -fdata-sections \
+            -Wl,--gc-sections -Wl,--as-needed -Wl,-O2 \
+            -DMINIZ_NO_ARCHIVE_WRITING_APIS -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES \
+            -I$SYSROOT/usr/include -L$SYSROOT/usr/lib \
+            -lcurl -lz -lssl -lcrypto \
+            -s
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.out }}
+          path: ${{ matrix.out }}
+
+  push:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: clang_version
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: binaries
+          merge-multiple: true
+
+      - name: Push to clang_version branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          mkdir -p binaries
+          git add -A binaries
+
+          git commit -m "update binaries $(date '+%Y-%m-%d %H:%M:%S')" || true
+          git push origin clang_version
