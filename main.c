@@ -48,6 +48,30 @@ void on_cancel(int sig) {
     exit(1);
 }
 
+void read_input(char *buffer, int size) {
+    static FILE *tty = NULL;
+    if (!tty) {
+        tty = fopen("/dev/tty", "r");
+        if (!tty) {
+            if (isatty(fileno(stdin))) {
+                tty = stdin;
+            }
+        }
+    }
+    
+    fflush(stdout);
+    
+    if (tty) {
+        if (fgets(buffer, size, tty)) {
+            buffer[strcspn(buffer, "\n")] = 0;
+        } else {
+            buffer[0] = '\0';
+        }
+    } else {
+        buffer[0] = '\0';
+    }
+}
+
 char* str_replace(const char* src, const char* find, const char* replace) {
     size_t src_len = strlen(src), find_len = strlen(find), replace_len = strlen(replace);
     size_t count = 0;
@@ -304,21 +328,21 @@ int main(int argc, char *argv[]) {
     
     if (access(RISH_PATH, F_OK) != -1 && !ACTION_REINSTALL && !SILENT_MODE) {
         printf("%s[?]%s rish installed. Reinstall? [y/N]: ", CY, C0);
-        char c = getchar();
-        int ch; while ((ch = getchar()) != '\n' && ch != EOF);
-        if (c == 'y' || c == 'Y') ACTION_REINSTALL = 1;
+        char c_line[16] = {0};
+        read_input(c_line, sizeof(c_line));
+        if (c_line[0] == 'y' || c_line[0] == 'Y') ACTION_REINSTALL = 1;
         else cancel("Cancelled.");
     }
     
     if (!SILENT_MODE && !SOURCE_PROVIDED) {
         printf("\n%sSelect source:%s\n 1) Offline (Extract app)\n 2) RikkaApps/Shizuku\n 3) thedjchi/Shizuku\n 4) Custom Repo\n 5) Direct URL\n 6) Local APK\n", CB, C0);
         printf("Choice [1-6]: ");
-        int choice; 
-        if (scanf("%d", &choice) != 1) { choice = 0; }
-
-        int ch; while ((ch = getchar()) != '\n' && ch != EOF);
         
-        char input_buf[512];
+        char choice_line[16] = {0};
+        read_input(choice_line, sizeof(choice_line));
+        int choice = atoi(choice_line);
+        
+        char input_buf[512] = {0};
         switch(choice) {
             case 1: SOURCE_MODE = "local_app"; break;
             case 2: SOURCE_MODE = "default"; break;
@@ -326,26 +350,20 @@ int main(int argc, char *argv[]) {
             case 4: 
                 SOURCE_MODE = "custom_repo"; 
                 printf("Repo (user/repo): "); 
-                input_buf[0] = '\0';
-                scanf("%255s", input_buf); 
+                read_input(input_buf, sizeof(input_buf));
                 SOURCE_PATH = strdup(input_buf); 
-                while ((ch = getchar()) != '\n' && ch != EOF);
                 break;
             case 5: 
                 SOURCE_MODE = "custom_url"; 
                 printf("URL: "); 
-                input_buf[0] = '\0';
-                scanf("%511[^\n]", input_buf); 
+                read_input(input_buf, sizeof(input_buf));
                 SOURCE_PATH = strdup(input_buf); 
-                while ((ch = getchar()) != '\n' && ch != EOF);
                 break;
             case 6: 
                 SOURCE_MODE = "local_file"; 
                 printf("Path: "); 
-                input_buf[0] = '\0';
-                scanf("%511[^\n]", input_buf); 
+                read_input(input_buf, sizeof(input_buf));
                 SOURCE_PATH = strdup(input_buf); 
-                while ((ch = getchar()) != '\n' && ch != EOF);
                 break;
             default: cancel("Invalid choice. Cancelled.");
         }
@@ -402,8 +420,10 @@ int main(int argc, char *argv[]) {
             if (strcmp(SOURCE_MODE, "default") == 0) REPO = "RikkaApps/Shizuku";
             else if (strcmp(SOURCE_MODE, "thedjchi") == 0) REPO = "thedjchi/Shizuku";
             else REPO = SOURCE_PATH;
+            
             if (!REPO) cancel("No repo provided. Cancelled.");
             step("Fetching from %s...", REPO);
+            
             char *url = fetch_github_url(REPO);
             step("Downloading APK...");
             download_file(url, APK_PATH);
@@ -416,16 +436,21 @@ int main(int argc, char *argv[]) {
     
     step("Extracting...");
     extract_apk(APK_PATH);
+    
     const char *sh_path = getenv("SHELL");
     if (!sh_path) sh_path = "/system/bin/sh";
+
     char extracted_rish[512], final_rish[512];
     snprintf(extracted_rish, sizeof(extracted_rish), "%s/rish", TMP_SUBDIR);
     snprintf(final_rish, sizeof(final_rish), "%s/rish_final", TMP_SUBDIR);
+    
     process_rish_file(extracted_rish, final_rish, sh_path, PKG);
+    
     step("Installing...");
     char final_dex[512];
     snprintf(final_dex, sizeof(final_dex), "%s/rish_shizuku.dex", TMP_SUBDIR);
     install_files(final_rish, final_dex);
+
     curl_global_cleanup();
     return 0;
 }
