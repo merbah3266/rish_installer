@@ -48,22 +48,27 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq dpkg > /dev/null
           mkdir -p $HOME/termux_sysroot
+          
           wget -q https://packages.termux.dev/apt/termux-main/dists/stable/main/binary-${{ matrix.termux_arch }}/Packages -O termux_packages.txt
+          tr -d '\r' < termux_packages.txt > termux_packages_clean.txt
 
           download_and_extract() {
             local pkg_name=$1
-            local pkg_path=$(awk -v pkg="Package: $pkg_name" '
-              $0 == pkg { found=1 }
-              found && /^Filename:/ { print $2; exit }
-            ' termux_packages.txt)
+            local pkg_path=$(grep -A 50 "^Package: ${pkg_name}$" termux_packages_clean.txt | grep "^Filename:" | head -n 1 | awk '{print $2}')
 
-            if [ -z "$pkg_path" ]; then echo "Failed to find $pkg_name"; exit 1; fi
+            if [ -z "$pkg_path" ]; then 
+              echo "Failed to find $pkg_name in Termux repo"
+              exit 1
+            fi
+
             wget -q "https://packages.termux.dev/apt/termux-main/$pkg_path" -O /tmp/$pkg_name.deb
             dpkg-deb -x /tmp/$pkg_name.deb $HOME/termux_sysroot
           }
 
           download_and_extract libcurl
-          download_and_extract libopenssl
+          download_and_extract openssl
+          download_and_extract libnghttp2
+          download_and_extract libssh2
           download_and_extract zlib
 
       - name: Build with NDK Clang
