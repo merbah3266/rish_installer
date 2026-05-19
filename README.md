@@ -207,3 +207,11 @@ Choice [1-6]:
 ## Support
 
 If the script does not work correctly, please [open an issue](https://github.com/merbah3266/rish_installer/issues) on the repository page so we can help you.
+
+## Credits
+
+This project includes portions of code from:
+
+- miniz — by Rich Geldreich ([@richgel999](https://github.com/richgel999)) 
+  Repository:
+  https://github.com/richgel999/miniz
