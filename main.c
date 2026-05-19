@@ -315,6 +315,7 @@ int main(int argc, char *argv[]) {
         printf("Choice [1-6]: ");
         int choice; 
         if (scanf("%d", &choice) != 1) { choice = 0; }
+
         int ch; while ((ch = getchar()) != '\n' && ch != EOF);
         
         char input_buf[512];
@@ -401,10 +402,8 @@ int main(int argc, char *argv[]) {
             if (strcmp(SOURCE_MODE, "default") == 0) REPO = "RikkaApps/Shizuku";
             else if (strcmp(SOURCE_MODE, "thedjchi") == 0) REPO = "thedjchi/Shizuku";
             else REPO = SOURCE_PATH;
-            
             if (!REPO) cancel("No repo provided. Cancelled.");
             step("Fetching from %s...", REPO);
-            
             char *url = fetch_github_url(REPO);
             step("Downloading APK...");
             download_file(url, APK_PATH);
@@ -417,21 +416,16 @@ int main(int argc, char *argv[]) {
     
     step("Extracting...");
     extract_apk(APK_PATH);
-    
     const char *sh_path = getenv("SHELL");
     if (!sh_path) sh_path = "/system/bin/sh";
-
     char extracted_rish[512], final_rish[512];
     snprintf(extracted_rish, sizeof(extracted_rish), "%s/rish", TMP_SUBDIR);
     snprintf(final_rish, sizeof(final_rish), "%s/rish_final", TMP_SUBDIR);
-    
     process_rish_file(extracted_rish, final_rish, sh_path, PKG);
-    
     step("Installing...");
     char final_dex[512];
     snprintf(final_dex, sizeof(final_dex), "%s/rish_shizuku.dex", TMP_SUBDIR);
     install_files(final_rish, final_dex);
-
     curl_global_cleanup();
     return 0;
 }
