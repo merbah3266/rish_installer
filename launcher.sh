@@ -18,7 +18,12 @@ chmod +x "$BINARY_PATH" 2>/dev/null || { echo "Error: chmod failed" >&2; exit 1;
 "$BINARY_PATH" "$@"
 EXIT_CODE=$?
 rm -f "$BINARY_PATH"
+case "$0" in
+*proc*) ;;
+*)
 if [ -w "$0" ]; then
 rm -f "$0"
 fi
+;;
+esac
 exit $EXIT_CODE
