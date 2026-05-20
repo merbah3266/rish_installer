@@ -369,7 +369,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (SILENT_MODE) ok("Starting silent rish installation...");
+    if (SILENT_MODE) printf("%s[+]%s Starting silent rish installation...\n", CG, C0);
     
     snprintf(TMP_SUBDIR, sizeof(TMP_SUBDIR), "%s/rish.%d", getenv("TMPDIR") ? getenv("TMPDIR") : "/tmp", rand());
     mkdir(TMP_SUBDIR, 0755);
