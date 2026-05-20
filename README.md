@@ -62,7 +62,7 @@ Why should you try the C version?
 
 ## Features (Applies to both versions)
 
-*   **Smart Offline-First:** Automatically tries to extract Rish from the installed Shizuku app before downloading from the internet.
+*   **Smart Offline Mode:** This option works only if the Shizuku app is installed, attempting to extract Rish from it.
 *   **Interactive & Silent Modes:** User-friendly menu by default, or completely silent for automation and scripts.
 *   **Multiple Sources:** Download from the official repo, alternative repos, direct URLs, or local APK files.
 *   **Automatic BusyBox Fallback (Bash only):** If your terminal lacks standard tools, it automatically downloads a standalone BusyBox binary.
