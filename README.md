@@ -203,6 +203,7 @@ Choice [1-6]:
 *   **Shizuku Running:** Ensure the Shizuku app is running and your terminal app is authorized in Shizuku's permissions.
 *   **Internet Connection:** Required only if you are downloading from a GitHub repo or Direct URL.
 *   **Shizuku Version:** It is highly recommended to use the [latest version](https://github.com/RikkaApps/Shizuku/releases/) of Shizuku from GitHub. The Play Store version is often outdated.
+*   **Offline mode:** This mode works only if the Shizuku app is installed on your device and you are using the Termux app. (It may not work with other terminals.)
 
 ## Support
 
