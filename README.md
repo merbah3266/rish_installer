@@ -209,6 +209,16 @@ Choice [1-6]:
 
 If the script does not work correctly, please [open an issue](https://github.com/merbah3266/rish_installer/issues) on the repository page so we can help you.
 
+## Star History
+
+<a href="https://www.star-history.com/?repos=merbah3266%2Frish_installer&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ## Credits
 
 This project includes portions of code from:
