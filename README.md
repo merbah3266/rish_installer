@@ -213,9 +213,9 @@ If the script does not work correctly, please [open an issue](https://github.com
 
 <a href="https://www.star-history.com/?repos=merbah3266%2Frish_installer&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&theme=dark&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1Cymm6FGSYa-HWW81Kaydeh-tzjZtNc0G_qSnv5DeTHQXSeiX2JmQ_OuadyJFJtQ" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1Cymm6FGSYa-HWW81Kaydeh-tzjZtNc0G_qSnv5DeTHQXSeiX2JmQ_OuadyJFJtQ" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1Cymm6FGSYa-HWW81Kaydeh-tzjZtNc0G_qSnv5DeTHQXSeiX2JmQ_OuadyJFJtQ" />
  </picture>
 </a>
 
