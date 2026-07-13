@@ -350,6 +350,9 @@ Choice [1-6]:
 * **Root**
   * Do not run the installer as the root user.
 
+* **Native C Edition**
+  * The source code for the Native C Edition is maintained in the [`clang_version`](https://github.com/merbah3266/rish_installer/tree/clang_version) branch.
+
 # Support
 
 Questions, bug reports, feature requests, suggestions, and feedback are always welcome. If you encounter an issue or have an idea to improve the project, please open an issue on the project's [GitHub Issues](https://github.com/merbah3266/rish_installer/issues) page.
@@ -366,14 +369,8 @@ Questions, bug reports, feature requests, suggestions, and feedback are always w
 
 # Credits
 
-This project includes code from the following open-source projects:
+This project includes code from the following open-source project:
 
-## miniz
-
-Author: Rich Geldreich
-
-Repository:
-
-https://github.com/richgel999/miniz
-
-Licensed under the MIT License.
+- **miniz** by Rich Geldreich
+  - Repository: https://github.com/richgel999/miniz
+  - License: MIT License
