@@ -321,8 +321,9 @@ Choice [1-6]:
 # Requirements & Notes
 
 * **Supported Terminals**
-  * Termux is fully supported.
-  * MT Manager terminal is also supported.
+  * **Termux** — Fully supported and recommended.
+  * **MT Manager Terminal** — Supported.
+  * Other Android terminal applications may be compatible, but they are not officially supported. For the best experience, use one of the terminals listed above.
 
 * **Offline Mode (Recommended)**
   * If Shizuku is already installed on your device, Offline Mode is the recommended installation method.
