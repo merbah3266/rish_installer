@@ -1,189 +1,310 @@
 # Shizuku Rish Installer
 
-A smart, highly customizable, and robust installer for Shizuku's Rish (Remote Shell) on Android terminals.
+A lightweight installer for Shizuku's Rish (Remote Shell) on Android terminal applications.
 
-> **Did you know?** This project now has a **Native C Edition**! It's extremely fast, ultra-lightweight (~32KB), and requires almost zero external tools. [Check it out below](#native-c-edition-features).
+This project is available in two editions:
 
-## Quick Start
+- **Bash Edition** (`main`) – Feature-rich, with automatic BusyBox fallback for minimal environments.
+- **Native C Edition** (`clang_version`) – Lightweight, fast, and designed with minimal external dependencies.
 
-You have two versions to choose from: The original **Bash Script** (feature-rich with BusyBox fallback) and the **Native C Binary** (ultra-fast and standalone).
+Both editions provide the same installation experience, support the same command-line options, and are compatible with the same installation sources.
 
-### Install Interactively
+> **Did you know?** The Native C Edition is only about **32KB**, starts almost instantly, and performs ZIP extraction using the built-in **miniz** library instead of external utilities.
 
-**Bash Version:**
+# Quick Start
+
+Choose the edition you want to use.
+
+## Install Interactively
+
+### Bash Edition
+
 ```bash
 bash <(curl -fsSL tinyurl.com/rish3266)
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh)
 ```
 
-### Run using `sh` (No Bash required)
+## Run using `sh` (No Bash required)
 
-**Bash Version:**
+### Bash Edition
+
 ```bash
-curl -fSsL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh
+curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh | sh
 ```
 
-### Pass flags via `sh`
+## Pass Command-Line Flags via `sh`
 
-**Bash Version:**
+### Bash Edition
+
 ```bash
-curl -fSsL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh -s -- --silent
+curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh -s -- --silent
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh | sh -s -- --silent
 ```
 
-### Uninstall
+## Uninstall
 
-**Bash Version:**
+### Bash Edition
+
 ```bash
 bash <(curl -fsSL tinyurl.com/rish3266) --uninstall
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --uninstall
 ```
 
-## Native C Edition Features
+# Native C Edition Features
 
-Why should you try the C version? 
+Why choose the Native C edition?
 
-*   **Ultra-Lightweight:** The compiled binary is only **~32KB** in size!
-*   **Blazing Fast:** Executes instantly as native machine code. No script parsing overhead.
-*   **Almost Zero Dependencies:** Does not rely on system `unzip`, `sed`, `grep`, or even `curl` executables. It uses built-in `miniz` for ZIP extraction and `libcurl` for downloads.
+* **Ultra-Lightweight:** Compiled binary (~32KB).
+* **Fast Startup:** Native executable with no shell parsing overhead.
+* **Minimal Dependencies:** Uses built-in **miniz** for ZIP extraction and **libcurl** for downloads instead of relying on external tools such as `unzip`, `sed`, and `grep`.
+* **Same User Experience:** Supports the same interactive menu, installation sources, and command-line options as the Bash edition.
 
-## Features (Applies to both versions)
+# Features
 
-*   **Smart Offline Mode:** This option works only if the Shizuku app is installed, attempting to extract Rish from it.
-*   **Interactive & Silent Modes:** User-friendly menu by default, or completely silent for automation and scripts.
-*   **Multiple Sources:** Download from the official repo, alternative repos, direct URLs, or local APK files.
-*   **Automatic BusyBox Fallback (Bash only):** If your terminal lacks standard tools, it automatically downloads a standalone BusyBox binary.
-*   **Smart Installation Paths:** Tries to install to the system `$BIN` first; if permission is denied, it falls back to `$HOME` and creates symlinks automatically.
-*   **Auto Package Detection:** Automatically detects your terminal's package name (e.g., `com.termux`) to configure Rish correctly.
-*   **Safe by Design:** Refuses to run as `root` automatically, protecting your environment.
+The following features are available in both editions unless otherwise noted.
 
-## Advanced Usage (Flags)
+* **Offline Mode:** Extracts `rish` directly from the installed Shizuku application whenever possible.
+* **Default Source:** Selecting `default` (explicitly with `--source default` or implicitly when no source is specified in Silent Mode) first attempts Offline Mode. If no local Shizuku installation is found, the installer downloads the latest release from `RikkaApps/Shizuku`.
+* **Multiple Installation Sources:** Supports the installed application, GitHub releases, custom repositories, direct APK URLs, and local APK files.
+* **Interactive & Silent Modes:** Suitable for both interactive use and automated scripts.
+* **Automatic Package Detection:** Detects the terminal application's Android package automatically and patches `rish` accordingly.
+* **Smart Installation Paths:** Attempts to install into the terminal's binary directory first, then falls back to the user's home directory when necessary.
+* **Safe by Design:** Refuses to run as the root user.
+* **BusyBox Fallback (Bash Edition only):** Automatically downloads BusyBox when required utilities are unavailable.
 
-Both versions share the exact same command-line flags. You can bypass the interactive prompts by passing flags directly.
+# Command-line Reference
 
-### Silent Mode
-Installs without any interactive prompts. Only prints start, success, or failure messages.
+Both editions support the exact same command-line interface.
 
-**Bash Version:**
+## Available Options
+
+| Option | Description |
+|---------|-------------|
+| `--silent` | Performs a non-interactive installation. |
+| `--reinstall` | Reinstalls `rish` without asking for confirmation. |
+| `--uninstall` | Removes all installed files. |
+| `--source <mode>` | Selects the APK source. |
+| `--path <value>` | Specifies a repository, URL, or local file path depending on the selected source. |
+
+## Source Modes
+
+The installer supports the following values for `--source`:
+
+| Source | Description | Requires `--path` |
+|---------|-------------|-------------------|
+| `default` | Uses the default installation logic. First attempts Offline Mode, then falls back to the latest release from `RikkaApps/Shizuku` if necessary. | No |
+| `local_app` | Extracts the APK from the installed Shizuku application only. | No |
+| `thedjchi` | Downloads the latest release from `thedjchi/Shizuku`. | No |
+| `custom_repo` | Downloads the latest release from any GitHub repository. | Yes |
+| `custom_url` | Downloads an APK from a direct URL. | Yes |
+| `local_file` | Uses an APK already stored on the device. | Yes |
+
+## Examples
+
+### Silent Installation
+
+Installs without displaying any interactive prompts.
+
+### Bash Edition
+
 ```bash
 bash <(curl -fsSL tinyurl.com/rish3266) --silent
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --silent
 ```
 
 ### Force Reinstall
-If Rish is already installed, bypass the "Reinstall? [y/N]" prompt and overwrite it directly.
 
-**Bash Version:**
+Skips the reinstall confirmation dialog if `rish` is already installed.
+
+### Bash Edition
+
 ```bash
 bash <(curl -fsSL tinyurl.com/rish3266) --reinstall
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --reinstall
 ```
 
-### Specify Source (`--source` & `--path`)
-You can explicitly tell the installer where to get the Shizuku APK.
+### Offline Mode
 
-**1. Force Offline Extraction (Errors out if Shizuku is not installed):**
+Extracts the APK directly from the installed Shizuku application.
 
-**Bash Version:**
+### Bash Edition
+
 ```bash
 bash <(curl -fsSL tinyurl.com/rish3266) --source local_app
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --source local_app
 ```
 
-**2. Alternative GitHub Repo (`thedjchi/Shizuku`):**
+### Download from `thedjchi/Shizuku`
 
-**Bash Version:**
+### Bash Edition
+
 ```bash
 bash <(curl -fsSL tinyurl.com/rish3266) --source thedjchi
 ```
-**C Version:**
+
+### Native C Edition
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --source thedjchi
 ```
 
-**3. Custom GitHub Repo:**
+### Download from a Custom GitHub Repository
 
-**Bash Version:**
-```bash
-bash <(curl -fsSL tinyurl.com/rish3266) --source custom_repo --path "username/reponame"
+Specify the repository in the format:
+
 ```
-**C Version:**
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --source custom_repo --path "username/reponame"
+username/repository
 ```
 
-**4. Direct URL to APK:**
+### Bash Edition
 
-**Bash Version:**
 ```bash
-bash <(curl -fsSL tinyurl.com/rish3266) --source custom_url --path "https://example.com/shizuku.apk"
-```
-**C Version:**
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --source custom_url --path "https://example.com/shizuku.apk"
+bash <(curl -fsSL tinyurl.com/rish3266) \
+    --source custom_repo \
+    --path username/repository
 ```
 
-**5. Local APK File (No internet required):**
+### Native C Edition
 
-**Bash Version:**
 ```bash
-bash <(curl -fsSL tinyurl.com/rish3266) --source local_file --path "/sdcard/Download/shizuku.apk"
-```
-**C Version:**
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --source local_file --path "/sdcard/Download/shizuku.apk"
+bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+    --source custom_repo \
+    --path username/repository
 ```
 
-### Combining Flags
-You can combine `--silent` with any source flag.
+### Download from a Direct APK URL
 
-**Silent reinstall from the thedjchi repo:**
+### Bash Edition
 
-**Bash Version:**
 ```bash
-bash <(curl -fsSL tinyurl.com/rish3266) --silent --reinstall --source thedjchi
-```
-**C Version:**
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --silent --reinstall --source thedjchi
+bash <(curl -fsSL tinyurl.com/rish3266) \
+    --source custom_url \
+    --path https://example.com/shizuku.apk
 ```
 
-## How It Works (Under the Hood)
+### Native C Edition
 
-1.  **Package Detection:** The script/binary checks `$PREFIX`, `$PWD`, and `$HOME` to figure out your terminal app's Android package name (e.g., `com.termux`). This is required for Rish to bind to Shizuku.
-2.  **APK Acquisition:** Based on your choice (or the default logic):
-    *   It first attempts to run `cmd package path` to find the installed Shizuku APK and copy it.
-    *   If offline fails or a remote source is selected, it queries the GitHub API to find the latest release APK URL and downloads it.
-3.  **Extraction & Patching:** 
-    *   *Bash:* Unzips the APK, uses `sed`/`grep` to patch the `rish` file.
-    *   *C Native:* Uses `miniz` to extract directly from the ZIP stream, and C string manipulation to patch the file instantly.
-4.  **Installation:** Attempts to install the files to `$BIN`. If permission is denied, it gracefully falls back to installing directly in `$HOME` and creates symlinks (`~/rish`, `~/rish_shizuku.dex`).
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+    --source custom_url \
+    --path https://example.com/shizuku.apk
+```
 
-## Interactive Menu Options
+### Install from a Local APK
 
-When you run the installer without flags, you are presented with the following menu:
+### Bash Edition
+
+```bash
+bash <(curl -fsSL tinyurl.com/rish3266) \
+    --source local_file \
+    --path /sdcard/Download/shizuku.apk
+```
+
+### Native C Edition
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+    --source local_file \
+    --path /sdcard/Download/shizuku.apk
+```
+
+### Combining Options
+
+Options may be combined.
+
+Example:
+
+```bash
+--silent --reinstall --source thedjchi
+```
+
+Bash Edition:
+
+```bash
+bash <(curl -fsSL tinyurl.com/rish3266) \
+    --silent \
+    --reinstall \
+    --source thedjchi
+```
+
+Native C Edition:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+    --silent \
+    --reinstall \
+    --source thedjchi
+```
+
+# How It Works
+
+The installer performs the following steps:
+
+1. **Package Detection**
+   - Detects the Android package name of the current terminal application.
+   - The detected package is used to patch `rish` so it communicates with the correct terminal application.
+
+2. **APK Acquisition**
+   - Depending on the selected source, the installer:
+     - Extracts the installed Shizuku APK (Offline Mode),
+     - Downloads the latest release from GitHub,
+     - Downloads an APK from a direct URL,
+     - Uses a local APK file.
+
+3. **Extraction**
+   - Both `rish` and `rish_shizuku.dex` are extracted from the APK.
+   - Bash Edition uses external utilities (or BusyBox when required).
+   - Native C Edition performs extraction using the built-in **miniz** library.
+
+4. **Patching**
+   - The installer replaces the placeholder package name inside `rish` with the detected Android package name.
+
+5. **Installation**
+   - Attempts to install into the terminal's binary directory.
+   - If installation is not permitted, it automatically installs into the user's home directory instead.
+
+6. **Cleanup**
+   - Temporary files are removed automatically before exiting.
+
+# Interactive Menu
+
+Running the installer without command-line options opens the interactive menu.
 
 ```text
 Select source:
@@ -193,23 +314,46 @@ Select source:
  4) Custom Repo
  5) Direct URL
  6) Local APK
+
 Choice [1-6]:
 ```
 
-## Requirements & Notes
+# Requirements & Notes
 
-*   **Terminal App:** Termux or MT Manager terminal is highly recommended.
-*   **Offline Mode Limitation:** The Offline extraction might not work in MT Manager terminal due to internal permission restrictions. If it fails, please choose an online source or a local APK file.
-*   **Shizuku Running:** Ensure the Shizuku app is running and your terminal app is authorized in Shizuku's permissions.
-*   **Internet Connection:** Required only if you are downloading from a GitHub repo or Direct URL.
-*   **Shizuku Version:** It is highly recommended to use the [latest version](https://github.com/RikkaApps/Shizuku/releases/) of Shizuku from GitHub. The Play Store version is often outdated.
-*   **Offline mode:** This mode works only if the Shizuku app is installed on your device and you are using the Termux app. (It may not work with other terminals.)
+* **Supported Terminals**
+  * Termux is fully supported.
+  * MT Manager terminal is also supported.
 
-## Support
+* **Offline Mode (Recommended)**
+  * If Shizuku is already installed on your device, Offline Mode is the recommended installation method.
+  * It extracts `rish` directly from the installed APK, ensuring it always matches the installed Shizuku version.
 
-If the script does not work correctly, please [open an issue](https://github.com/merbah3266/rish_installer/issues) on the repository page so we can help you.
+* **Play Store Users**
+  * The Play Store release of Shizuku may not always match the latest GitHub release.
+  * If you installed Shizuku from the Play Store, **Offline Mode is strongly recommended** because it extracts `rish` directly from your installed application instead of downloading a different release.
 
-## Star History
+* **GitHub Users**
+  * If you installed Shizuku from GitHub, you may use either Offline Mode or download the latest release directly.
+
+* **Offline Mode Limitation**
+  * Offline extraction may fail in MT Manager terminal because of Android permission restrictions.
+  * If this happens, simply choose another installation source.
+
+* **Internet Connection**
+  * Required only when downloading from GitHub, a custom repository, or a direct APK URL.
+
+* **Shizuku**
+  * Ensure Shizuku is running.
+  * Make sure your terminal application has been authorized in Shizuku before running `rish`.
+
+* **Root**
+  * Do not run the installer as the root user.
+
+# Support
+
+Questions, bug reports, feature requests, suggestions, and feedback are always welcome. If you encounter an issue or have an idea to improve the project, please open an issue on the project's [GitHub Issues](https://github.com/merbah3266/rish_installer/issues) page.
+
+# Star History
 
 <a href="https://www.star-history.com/?repos=merbah3266%2Frish_installer&type=date&legend=top-left">
  <picture>
@@ -219,10 +363,16 @@ If the script does not work correctly, please [open an issue](https://github.com
  </picture>
 </a>
 
-## Credits
+# Credits
 
-This project includes portions of code from:
+This project includes code from the following open-source projects:
 
-- miniz — by Rich Geldreich ([@richgel999](https://github.com/richgel999)) 
-  Repository:
-  https://github.com/richgel999/miniz
+## miniz
+
+Author: Rich Geldreich
+
+Repository:
+
+https://github.com/richgel999/miniz
+
+Licensed under the MIT License.
