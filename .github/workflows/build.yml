@@ -10,9 +10,12 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     strategy:
       fail-fast: false
@@ -22,47 +25,71 @@ jobs:
             ndk_tool: aarch64-linux-android24-clang
             termux_arch: aarch64
             out: rish_installer_arm64
+
           - arch: arm
             ndk_tool: armv7a-linux-androideabi24-clang
             termux_arch: arm
             out: rish_installer_armv7
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: clang_version
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         id: cache-ndk
         with:
           path: $HOME/android-ndk-r26d
-          key: ndk-r26d
+          key: ndk-r26d-${{ runner.os }}
 
       - name: Setup NDK
         if: steps.cache-ndk.outputs.cache-hit != 'true'
         run: |
-          wget -q https://dl.google.com/android/repository/android-ndk-r26d-linux.zip
-          unzip -q android-ndk-r26d-linux.zip -d $HOME
+          wget -q \
+            https://dl.google.com/android/repository/android-ndk-r26d-linux.zip \
+            -O android-ndk-r26d-linux.zip
+
+          unzip -q android-ndk-r26d-linux.zip -d "$HOME"
+
+          rm -f android-ndk-r26d-linux.zip
 
       - name: Setup Termux Sysroot
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq dpkg > /dev/null
-          mkdir -p $HOME/termux_sysroot
-          
-          wget -q https://packages.termux.dev/apt/termux-main/dists/stable/main/binary-${{ matrix.termux_arch }}/Packages -O termux_packages.txt
-          tr -d '\r' < termux_packages.txt > termux_packages_clean.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq dpkg > /dev/null
+
+          mkdir -p "$HOME/termux_sysroot"
+
+          wget -q \
+            "https://packages.termux.dev/apt/termux-main/dists/stable/main/binary-${{ matrix.termux_arch }}/Packages" \
+            -O termux_packages.txt
+
+          tr -d '\r' \
+            < termux_packages.txt \
+            > termux_packages_clean.txt
 
           download_and_extract() {
-            local pkg_name=$1
-            local pkg_path=$(grep -A 50 "^Package: ${pkg_name}$" termux_packages_clean.txt | grep "^Filename:" | head -n 1 | awk '{print $2}')
+            local pkg_name="$1"
 
-            if [ -z "$pkg_path" ]; then 
+            local pkg_path
+            pkg_path=$(grep -A 50 "^Package: ${pkg_name}$" \
+              termux_packages_clean.txt |
+              grep "^Filename:" |
+              head -n 1 |
+              awk '{print $2}')
+
+            if [ -z "$pkg_path" ]; then
               echo "Failed to find $pkg_name in Termux repo"
               exit 1
             fi
 
-            wget -q "https://packages.termux.dev/apt/termux-main/$pkg_path" -O /tmp/$pkg_name.deb
-            dpkg-deb -x /tmp/$pkg_name.deb $HOME/termux_sysroot
+            wget -q \
+              "https://packages.termux.dev/apt/termux-main/$pkg_path" \
+              -O "/tmp/$pkg_name.deb"
+
+            dpkg-deb -x \
+              "/tmp/$pkg_name.deb" \
+              "$HOME/termux_sysroot"
           }
 
           download_and_extract libcurl
@@ -73,44 +100,68 @@ jobs:
 
       - name: Build with NDK Clang
         run: |
-          NDK=$HOME/android-ndk-r26d/toolchains/llvm/prebuilt/linux-x86_64/bin
-          SYSROOT=$HOME/termux_sysroot/data/data/com.termux/files
-          OUT=${{ matrix.out }}
+          NDK="$HOME/android-ndk-r26d/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          SYSROOT="$HOME/termux_sysroot/data/data/com.termux/files"
+          OUT="${{ matrix.out }}"
 
-          $NDK/${{ matrix.ndk_tool }} main.c miniz.c -o $OUT \
-            -Oz -flto -ffunction-sections -fdata-sections \
-            -Wl,--gc-sections -Wl,--as-needed -Wl,-O2 \
-            -DMINIZ_NO_ARCHIVE_WRITING_APIS -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES \
-            -I$SYSROOT/usr/include -L$SYSROOT/usr/lib \
-            -lcurl -lnghttp2 -lssh2 -lz -lssl -lcrypto \
+          "$NDK/${{ matrix.ndk_tool }}" \
+            main.c \
+            miniz.c \
+            -o "$OUT" \
+            -Oz \
+            -flto \
+            -ffunction-sections \
+            -fdata-sections \
+            -Wl,--gc-sections \
+            -Wl,--as-needed \
+            -Wl,-O2 \
+            -DMINIZ_NO_ARCHIVE_WRITING_APIS \
+            -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES \
+            -I"$SYSROOT/usr/include" \
+            -L"$SYSROOT/usr/lib" \
+            -lcurl \
+            -lnghttp2 \
+            -lssh2 \
+            -lz \
+            -lssl \
+            -lcrypto \
             -s
 
-      - uses: actions/upload-artifact@v4
+          file "$OUT"
+          ls -lh "$OUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.out }}
           path: ${{ matrix.out }}
+          if-no-files-found: error
 
   push:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: clang_version
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           path: binaries
           merge-multiple: true
 
       - name: Push to clang_version branch
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           mkdir -p binaries
+
           git add -A binaries
 
-          git commit -m "update binaries $(date '+%Y-%m-%d %H:%M:%S')" || true
+          git commit \
+            -m "update binaries $(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+            || true
+
           git push origin clang_version
