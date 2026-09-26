@@ -95,6 +95,8 @@ detect_pkg(){
 PKG="$(detect_pkg)"
 [ "$PKG" = "unknown" ] && err "Package detect failed"
 
+MANAGER_PKG="moe.shizuku.privileged.api"
+
 if [ -f "$RISH" ] && [ "$ACTION" != "reinstall" ] && [ "$SILENT_MODE" -eq 0 ]; then
   echo -ne "${CY}[?]${C0} rish installed. Reinstall? [y/N]: "
   read -r c < /dev/tty
@@ -253,7 +255,7 @@ TMP_RISH="$TMP_SUBDIR/rish.$RAND_ID"
 
 echo "#!$SH_PATH" > "$TMP_RISH"
 $GREP -v '^#' "$TMP_SUBDIR/assets/rish" >> "$TMP_RISH"
-$SED -i "s/PKG/$PKG/g" "$TMP_RISH"
+$SED -i "s/MANAGER_PKG/$MANAGER_PKG/g; s/PKG/$PKG/g" "$TMP_RISH"
 
 step "Installing..."
 INSTALL_SUCCESS=0
