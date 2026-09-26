@@ -94,7 +94,7 @@ char* str_replace(const char* src, const char* find, const char* replace) {
     return result;
 }
 
-void process_rish_file(const char* in_path, const char* out_path, const char* sh_path, const char* pkg) {
+void process_rish_file(const char* in_path, const char* out_path, const char* sh_path, const char* pkg, const char* manager_pkg) {
     FILE *in = fopen(in_path, "r");
     if (!in) err("Failed to open extracted rish");
     
@@ -118,8 +118,11 @@ void process_rish_file(const char* in_path, const char* out_path, const char* sh
     fread(content, 1, fsize, in); content[fsize] = 0;
     fclose(in);
     
-    char *replaced = str_replace(content, "PKG", pkg);
+    char *stage1 = str_replace(content, "MANAGER_PKG", manager_pkg);
     free(content);
+    
+    char *replaced = str_replace(stage1, "PKG", pkg);
+    free(stage1);
     
     out = fopen(out_path, "w");
     fputs(replaced, out);
@@ -326,6 +329,8 @@ int main(int argc, char *argv[]) {
     }
     if (strcmp(PKG, "unknown") == 0) err("Package detect failed");
     
+    const char *MANAGER_PKG = "moe.shizuku.privileged.api";
+    
     if (access(RISH_PATH, F_OK) != -1 && !ACTION_REINSTALL && !SILENT_MODE) {
         printf("%s[?]%s rish installed. Reinstall? [y/N]: ", CY, C0);
         char c_line[16] = {0};
@@ -444,7 +449,7 @@ int main(int argc, char *argv[]) {
     snprintf(extracted_rish, sizeof(extracted_rish), "%s/rish", TMP_SUBDIR);
     snprintf(final_rish, sizeof(final_rish), "%s/rish_final", TMP_SUBDIR);
     
-    process_rish_file(extracted_rish, final_rish, sh_path, PKG);
+    process_rish_file(extracted_rish, final_rish, sh_path, PKG, MANAGER_PKG);
     
     step("Installing...");
     char final_dex[512];
