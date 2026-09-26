@@ -26,7 +26,7 @@ bash <(curl -fsSL tinyurl.com/rish3266)
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh)
+bash <(curl -fsSL https://tinyurl.com/rish3266c)
 ```
 
 ## Run using `sh` (No Bash required)
@@ -40,7 +40,7 @@ curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish
 ### Native C Edition
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh | sh
+curl -fsSL https://tinyurl.com/rish3266c | sh
 ```
 
 ## Pass Command-Line Flags via `sh`
@@ -54,7 +54,7 @@ curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish
 ### Native C Edition
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh | sh -s -- --silent
+curl -fsSL https://tinyurl.com/rish3266c | sh -s -- --silent
 ```
 
 ## Uninstall
@@ -68,7 +68,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) --uninstall
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --uninstall
+bash <(curl -fsSL https://tinyurl.com/rish3266c) --uninstall
 ```
 
 # Native C Edition Features
@@ -135,7 +135,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) --silent
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --silent
+bash <(curl -fsSL https://tinyurl.com/rish3266c) --silent
 ```
 
 ### Force Reinstall
@@ -151,7 +151,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) --reinstall
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --reinstall
+bash <(curl -fsSL https://tinyurl.com/rish3266c) --reinstall
 ```
 
 ### Offline Mode
@@ -167,7 +167,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) --source local_app
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --source local_app
+bash <(curl -fsSL https://tinyurl.com/rish3266c) --source local_app
 ```
 
 ### Download from `thedjchi/Shizuku`
@@ -181,7 +181,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) --source thedjchi
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) --source thedjchi
+bash <(curl -fsSL https://tinyurl.com/rish3266c) --source thedjchi
 ```
 
 ### Download from a Custom GitHub Repository
@@ -203,7 +203,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) \
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+bash <(curl -fsSL https://tinyurl.com/rish3266c) \
     --source custom_repo \
     --path username/repository
 ```
@@ -221,7 +221,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) \
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+bash <(curl -fsSL https://tinyurl.com/rish3266c) \
     --source custom_url \
     --path https://example.com/shizuku.apk
 ```
@@ -239,7 +239,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) \
 ### Native C Edition
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+bash <(curl -fsSL https://tinyurl.com/rish3266c) \
     --source local_file \
     --path /sdcard/Download/shizuku.apk
 ```
@@ -266,7 +266,7 @@ bash <(curl -fsSL tinyurl.com/rish3266) \
 Native C Edition:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/clang_version/launcher.sh) \
+bash <(curl -fsSL https://tinyurl.com/rish3266c) \
     --silent \
     --reinstall \
     --source thedjchi
@@ -355,15 +355,15 @@ Choice [1-6]:
 
 # Support
 
-Questions, bug reports, feature requests, suggestions, and feedback are always welcome. If you encounter an issue or have an idea to improve the project, please open an issue on the project's [GitHub Issues](https://github.com/merbah3266/rish_installer/issues) page.
+Questions, bug reports, feature requests, suggestions, and feedback are always welcome. If you encounter an issue or have an idea to improve the project, please open an issue on the project's [GitHub issues](https://github.com/merbah3266/rish_installer/issues) page.
 
 # Star History
 
 <a href="https://www.star-history.com/?repos=merbah3266%2Frish_installer&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&theme=dark&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1Cymm6FGSYa-HWW81Kaydeh-tzjZtNc0G_qSnv5DeTHQXSeiX2JmQ_OuadyJFJtQ" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1Cymm6FGSYa-HWW81Kaydeh-tzjZtNc0G_qSnv5DeTHQXSeiX2JmQ_OuadyJFJtQ" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1Cymm6FGSYa-HWW81Kaydeh-tzjZtNc0G_qSnv5DeTHQXSeiX2JmQ_OuadyJFJtQ" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&theme=dark&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C[...]
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C[...]
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C[...]
  </picture>
 </a>
 
