@@ -34,7 +34,7 @@ bash <(curl -fsSL https://tinyurl.com/rish3266c)
 ### Bash Edition
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh
+curl -fsSL https://tinyurl.com/rish3266sh | sh
 ```
 
 ### Native C Edition
@@ -48,7 +48,7 @@ curl -fsSL https://tinyurl.com/rish3266c | sh
 ### Bash Edition
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/merbah3266/rish_installer/main/rish_launcher.sh | sh -s -- --silent
+curl -fsSL https://tinyurl.com/rish3266sh | sh -s -- --silent
 ```
 
 ### Native C Edition
@@ -361,9 +361,9 @@ Questions, bug reports, feature requests, suggestions, and feedback are always w
 
 <a href="https://www.star-history.com/?repos=merbah3266%2Frish_installer&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&theme=dark&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C[...]
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C[...]
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C[...]
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&theme=dark&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=merbah3266/rish_installer&type=date&legend=top-left&sealed_token=rkgV5ZbCimpbq4rJQLc3u_-ZSyiEEatzxTGk3htqZB8EawFhqOrHFQ1C" />
  </picture>
 </a>
 
